@@ -11,16 +11,18 @@ export default function TimeSince({ date }: TimeSinceProps) {
 
   useEffect(() => {
     const getTimeSince = () => {
-      // Parse the backend UTC timestamp
-      const utcDate = new Date(date);
+      let utcDate: Date;
 
-      // Convert to local time (browser timezone)
-      const localDate = new Date(
-        utcDate.getTime() + utcDate.getTimezoneOffset() * 60000
-      );
+      if (typeof date === "string") {
+        // Remove microseconds if present
+        const sanitized = date.replace(/\.(\d{3})\d*/, ".$1");
+        utcDate = new Date(sanitized);
+      } else {
+        utcDate = date;
+      }
 
       const now = new Date();
-      const diff = now.getTime() - localDate.getTime();
+      const diff = now.getTime() - utcDate.getTime();
       const absDiff = Math.abs(diff);
 
       const seconds = Math.floor(absDiff / 1000);
@@ -37,10 +39,7 @@ export default function TimeSince({ date }: TimeSinceProps) {
       return diff >= 0 ? result : `in ${result}`;
     };
 
-    // Initial calculation
     setTimeSince(getTimeSince());
-
-    // Update every second
     const interval = setInterval(() => setTimeSince(getTimeSince()), 1000);
     return () => clearInterval(interval);
   }, [date]);

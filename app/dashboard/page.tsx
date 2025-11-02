@@ -1,9 +1,22 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { TemperatureCard } from "@/components/custom/ui/TemperatureCard";
 import { HumidityCard } from "@/components/custom/ui/HumidityCard";
+import { getDHT11LatestReading } from "@/services/dht11Service";
+import { DHT11Reading } from "@/types/dht11";
 
-export default function Home() {
+export default function Dashboard() {
+  const [reading, setReading] = useState<DHT11Reading | null>(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      const data = await getDHT11LatestReading();
+      setReading(data);
+    }
+    fetchData();
+  }, []);
+
   return (
     <div className="min-h-screen p-8">
       <div className="mx-auto max-w-2xl">
@@ -13,14 +26,15 @@ export default function Home() {
         <p className="mb-8 text-muted-foreground">
           Real-time temperature and humidity monitoring
         </p>
+
         <div className="grid gap-6 sm:grid-cols-2">
           <TemperatureCard
-            value={25}
-            timestamp="2025-11-02T18:45:00Z"
+            value={reading?.temperature ?? 0}
+            timestamp={reading?.timestamp ?? ""}
           />
           <HumidityCard
-            value={60}
-            timestamp="2025-11-02T18:45:00Z"
+            value={reading?.humidity ?? 0}
+            timestamp={reading?.timestamp ?? ""}
           />
         </div>
       </div>
