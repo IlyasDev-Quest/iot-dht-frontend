@@ -10,11 +10,29 @@ export default function Dashboard() {
   const [reading, setReading] = useState<DHT11Reading | null>(null);
 
   useEffect(() => {
-    async function fetchData() {
-      const data = await getDHT11LatestReading();
-      setReading(data);
-    }
+    let isMounted = true; // prevent state updates after unmount
+    const intervalMs = 5000; // fetch every 5 seconds
+
+    const fetchData = async () => {
+      try {
+        const data = await getDHT11LatestReading();
+        if (isMounted) setReading(data);
+      } catch (error) {
+        console.error("Failed to fetch DHT11 reading:", error);
+      }
+    };
+
+    // Initial fetch immediately
     fetchData();
+
+    // Polling
+    const interval = setInterval(fetchData, intervalMs);
+
+    // Cleanup
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
   }, []);
 
   return (
