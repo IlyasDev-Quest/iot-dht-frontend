@@ -8,12 +8,13 @@ const ReactApexChart = dynamic(() => import("react-apexcharts"), {
 
 const ApexChart = () => {
   const series = [
-    { name: "series1", data: [31, 40, 28, 51, 42, 109, 100] },
-    { name: "series2", data: [11, 32, 45, 32, 34, 52, 41] },
+    { name: "Temperature", data: [31, 40, 28, 51, 42, 109, 100] },
+    { name: "Humidity", data: [11, 32, 45, 32, 34, 52, 41] },
   ];
 
   const options: ApexOptions = {
     chart: { height: 350, type: "area" },
+    colors: ["#FF4560", "#008FFB"],
     dataLabels: { enabled: false },
     stroke: { curve: "smooth" },
     xaxis: {

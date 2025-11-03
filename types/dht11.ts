@@ -3,3 +3,10 @@ export interface DHT11Reading {
   humidity: number;
   timestamp: string;
 }
+
+export interface DHT11ReadingsQuery {
+  startDate?: string;
+  endDate?: string;
+  limit?: number;
+  offset?: number;
+}
