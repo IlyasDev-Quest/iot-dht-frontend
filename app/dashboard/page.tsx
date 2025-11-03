@@ -5,6 +5,7 @@ import { TemperatureCard } from "@/components/custom/ui/TemperatureCard";
 import { HumidityCard } from "@/components/custom/ui/HumidityCard";
 import { getDHT11LatestReading } from "@/services/dht11Service";
 import { DHT11Reading } from "@/types/dht11";
+import ApexChart from "@/components/custom/ui/ApexChart";
 
 export default function Dashboard() {
   const [reading, setReading] = useState<DHT11Reading | null>(null);
@@ -54,6 +55,9 @@ export default function Dashboard() {
             value={reading?.humidity ?? 0}
             timestamp={reading?.timestamp ?? ""}
           />
+        </div>
+        <div className="col-span-2 mt-6">
+          <ApexChart />
         </div>
       </div>
     </div>
