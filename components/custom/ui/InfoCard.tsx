@@ -46,9 +46,7 @@ export function InfoCard({
   mutedTextColor = "text-muted-foreground",
 }: InfoCardProps) {
   return (
-    <div
-      className={`overflow-hidden rounded-2xl border ${borderColor} p-6 shadow-sm transition-shadow duration-200 hover:shadow-md ${cardBg}`}
-    >
+    <div className={`card ${borderColor} ${cardBg}`}>
       <div className="flex flex-col items-center justify-center gap-4">
         {icon && (
           <div

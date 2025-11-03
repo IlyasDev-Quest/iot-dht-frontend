@@ -120,3 +120,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .card {
+    @apply overflow-hidden bg-white rounded-2xl border p-6 shadow-sm transition-shadow duration-200 hover:shadow-md;
+  }
+}

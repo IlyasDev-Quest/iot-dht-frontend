@@ -1,5 +1,4 @@
 import dynamic from "next/dynamic";
-import React from "react";
 import { ApexOptions } from "apexcharts";
 
 // Only import react-apexcharts on the client
@@ -33,7 +32,7 @@ const ApexChart = () => {
   };
 
   return (
-    <div className="rounded-lg bg-white p-6 shadow-sm transition-shadow duration-200 hover:shadow-md">
+    <div className="card">
       <ReactApexChart
         options={options}
         series={series}
