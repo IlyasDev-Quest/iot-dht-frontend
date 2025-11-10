@@ -10,29 +10,43 @@ import ApexChart from "@/components/custom/ui/ApexChart";
 export default function Dashboard() {
   const [reading, setReading] = useState<DHT11Reading | null>(null);
 
-  useEffect(() => {
-    let isMounted = true; // prevent state updates after unmount
-    const intervalMs = 5000; // fetch every 5 seconds
-
-    const fetchData = async () => {
+  useEffect(() => {    
+    // Fetch initial data
+    const fetchInitialData = async () => {
+      console.log("Fetching initial data...");
       try {
         const data = await getDHT11LatestReading();
-        if (isMounted) setReading(data);
-      } catch (error) {
-        console.error("Failed to fetch DHT11 reading:", error);
+        console.log("Initial data received:", data);
+        setReading(data);
+      } catch (err) {
+        console.error("Failed to fetch initial reading:", err);
       }
     };
 
-    // Initial fetch immediately
-    fetchData();
+    fetchInitialData();
 
-    // Polling
-    const interval = setInterval(fetchData, intervalMs);
+    // Create EventSource for SSE
+    const url = `${process.env.NEXT_PUBLIC_BACKEND_API}/v1/events`;
+    
+    const eventSource = new EventSource(url);
 
-    // Cleanup
+    // Listen for the custom event
+    eventSource.addEventListener("dht11_reading_created", async (event) => {
+      try {
+        const data = await getDHT11LatestReading();
+        console.log("New reading fetched:", data);
+        setReading(data);
+      } catch (err) {
+        console.error("Failed to fetch reading:", err);
+      }
+    });
+
+    eventSource.onerror = (error) => {
+      console.error("❌ SSE connection error:", error);
+    };
+
     return () => {
-      isMounted = false;
-      clearInterval(interval);
+      eventSource.close();
     };
   }, []);
 
