@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useAuth } from "@/components/AuthProviderClient";
 import { TemperatureCard } from "@/components/custom/ui/TemperatureCard";
 import { HumidityCard } from "@/components/custom/ui/HumidityCard";
 import { getDHT11LatestReading } from "@/services/dht11Service";
@@ -9,6 +10,7 @@ import ApexChart from "@/components/custom/ui/ApexChart";
 
 export default function Dashboard() {
   const [reading, setReading] = useState<DHT11Reading | null>(null);
+  const { currentUser, logout } = useAuth();
 
   useEffect(() => {    
     // Fetch initial data
@@ -52,14 +54,24 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen p-8">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="mb-2 text-4xl font-semibold text-foreground">Environmental Status</h1>
+          <p className="text-sm text-muted-foreground">Real-time temperature and humidity monitoring</p>
+        </div>
+        <div className="text-right">
+          {currentUser ? (
+            <div className="text-sm">
+              <div>Signed in as <strong>{currentUser.name}</strong></div>
+              <div className="text-xs text-muted-foreground">Role: {currentUser.role}</div>
+              <button onClick={() => logout()} className="mt-2 text-red-600 text-sm">Sign out</button>
+            </div>
+          ) : (
+            <div className="text-sm">Not signed in</div>
+          )}
+        </div>
+      </div>
       <div className="mx-auto max-w-2xl">
-        <h1 className="mb-2 text-4xl font-semibold text-foreground">
-          Environmental Status
-        </h1>
-        <p className="mb-8 text-muted-foreground">
-          Real-time temperature and humidity monitoring
-        </p>
-
         <div className="grid gap-6 sm:grid-cols-2">
           <TemperatureCard
             value={reading?.temperature ?? 0}
