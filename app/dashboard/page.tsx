@@ -5,12 +5,12 @@ import { TemperatureCard } from "@/components/custom/ui/TemperatureCard";
 import { HumidityCard } from "@/components/custom/ui/HumidityCard";
 import { getDHT11LatestReading } from "@/services/dht11Service";
 import { DHT11Reading } from "@/types/dht11";
-import ApexChart from "@/components/custom/ui/ApexChart";
+import ChartCard from "@/components/custom/ui/ChartCard";
 
 export default function Dashboard() {
   const [reading, setReading] = useState<DHT11Reading | null>(null);
 
-  useEffect(() => {    
+  useEffect(() => {
     // Fetch initial data
     const fetchInitialData = async () => {
       console.log("Fetching initial data...");
@@ -27,7 +27,7 @@ export default function Dashboard() {
 
     // Create EventSource for SSE
     const url = `${process.env.NEXT_PUBLIC_BACKEND_API}/v1/events`;
-    
+
     const eventSource = new EventSource(url);
 
     // Listen for the custom event
@@ -71,7 +71,7 @@ export default function Dashboard() {
           />
         </div>
         <div className="col-span-2 mt-6">
-          <ApexChart />
+          <ChartCard />
         </div>
       </div>
     </div>
