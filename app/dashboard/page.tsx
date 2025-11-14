@@ -1,54 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { TemperatureCard } from "@/components/custom/ui/TemperatureCard";
 import { HumidityCard } from "@/components/custom/ui/HumidityCard";
-import { getDHT11LatestReading } from "@/services/dht11Service";
-import { DHT11Reading } from "@/types/dht11";
 import ChartCard from "@/components/custom/ui/ChartCard";
+import { useDHT11LatestReading } from "@/hooks/useDHT11LatestReading";
 
 export default function Dashboard() {
-  const [reading, setReading] = useState<DHT11Reading | null>(null);
-
-  useEffect(() => {
-    // Fetch initial data
-    const fetchInitialData = async () => {
-      console.log("Fetching initial data...");
-      try {
-        const data = await getDHT11LatestReading();
-        console.log("Initial data received:", data);
-        setReading(data);
-      } catch (err) {
-        console.error("Failed to fetch initial reading:", err);
-      }
-    };
-
-    fetchInitialData();
-
-    // Create EventSource for SSE
-    const url = `${process.env.NEXT_PUBLIC_BACKEND_API}/v1/events`;
-
-    const eventSource = new EventSource(url);
-
-    // Listen for the custom event
-    eventSource.addEventListener("dht11_reading_created", async (event) => {
-      try {
-        const data = await getDHT11LatestReading();
-        console.log("New reading fetched:", data);
-        setReading(data);
-      } catch (err) {
-        console.error("Failed to fetch reading:", err);
-      }
-    });
-
-    eventSource.onerror = (error) => {
-      console.error("❌ SSE connection error:", error);
-    };
-
-    return () => {
-      eventSource.close();
-    };
-  }, []);
+  const { reading, error } = useDHT11LatestReading();
 
   return (
     <div className="min-h-screen p-8">
@@ -60,6 +18,8 @@ export default function Dashboard() {
           Real-time temperature and humidity monitoring
         </p>
 
+        {error && <p className="text-red-500 mb-4">{error}</p>}
+
         <div className="grid gap-6 sm:grid-cols-2">
           <TemperatureCard
             value={reading?.temperature ?? 0}
@@ -70,6 +30,7 @@ export default function Dashboard() {
             timestamp={reading?.timestamp ?? ""}
           />
         </div>
+
         <div className="col-span-2 mt-6">
           <ChartCard />
         </div>
