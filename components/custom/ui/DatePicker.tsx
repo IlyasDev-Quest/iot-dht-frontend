@@ -14,35 +14,34 @@ import {
 
 interface DatePickerProps {
   label: string;
+  value: Date | undefined;
+  onChange: (date: Date | undefined) => void;
 }
 
-export function DatePicker({ label }: DatePickerProps) {
+export function DatePicker({ label, value, onChange }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
-  const [date, setDate] = React.useState<Date | undefined>(undefined);
 
   return (
     <div className="flex flex-col gap-3">
-      <Label htmlFor="date" className="px-1">
-        {label}
-      </Label>
+      <Label className="px-1">{label}</Label>
+
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            id="date"
             className="w-48 justify-between font-normal"
           >
-            {date ? date.toLocaleDateString() : "Select date"}
+            {value ? value.toLocaleDateString() : "Select date"}
             <ChevronDownIcon />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+
+        <PopoverContent className="w-auto p-0">
           <Calendar
             mode="single"
-            selected={date}
-            captionLayout="dropdown"
+            selected={value}
             onSelect={(date) => {
-              setDate(date);
+              onChange(date);
               setOpen(false);
             }}
           />

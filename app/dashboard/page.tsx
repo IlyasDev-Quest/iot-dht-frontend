@@ -11,6 +11,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen p-8">
       <div className="mx-auto max-w-2xl">
+        {/* Page Header */}
         <h1 className="mb-2 text-4xl font-semibold text-foreground">
           Environmental Status
         </h1>
@@ -18,8 +19,10 @@ export default function Dashboard() {
           Real-time temperature and humidity monitoring
         </p>
 
+        {/* Error handling for latest readings */}
         {error && <p className="text-red-500 mb-4">{error}</p>}
 
+        {/* Temperature and Humidity Cards */}
         <div className="grid gap-6 sm:grid-cols-2">
           <TemperatureCard
             value={reading?.temperature ?? 0}
@@ -31,6 +34,7 @@ export default function Dashboard() {
           />
         </div>
 
+        {/* Chart Section */}
         <div className="col-span-2 mt-6">
           <ChartCard />
         </div>

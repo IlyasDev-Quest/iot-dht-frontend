@@ -5,8 +5,15 @@ export interface DHT11Reading {
 }
 
 export interface DHT11ReadingsQuery {
-  startDate?: string;
-  endDate?: string;
+  start: Date;
+  end: Date;
   limit?: number;
   offset?: number;
+}
+
+export interface DHT11ReadingsResponse {
+  items: DHT11Reading[];
+  total: number;
+  limit: number;
+  offset: number;
 }
