@@ -1,19 +1,26 @@
 // hooks/useChartData.ts
 import { useState, useCallback } from "react";
-import { getDHT11Readings } from "@/services/dht11Service";
+import { getDHT11ChartData, getOptimalGroupBy } from "@/services/dht11Service";
+import { GroupBy } from "@/types/dht11";
 
 export interface ChartSeries {
   name: string;
   data: { x: string; y: number }[];
 }
 
+export interface ChartDataWithRange extends ChartSeries {
+  min?: { x: string; y: number }[];
+  max?: { x: string; y: number }[];
+}
+
 export function useChartData() {
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
-  const [data, setData] = useState<ChartSeries[]>([]);
+  const [data, setData] = useState<ChartDataWithRange[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [noData, setNoData] = useState(false); // <-- new
+  const [noData, setNoData] = useState(false);
+  const [groupBy, setGroupBy] = useState<GroupBy>("day");
 
   const fetchData = useCallback(async () => {
     if (!startDate || !endDate) return;
@@ -29,26 +36,53 @@ export function useChartData() {
       const normalizedEnd = new Date(endDate);
       normalizedEnd.setHours(23, 59, 59, 999);
 
-      const readings = await getDHT11Readings({
-        start: normalizedStart,
-        end: normalizedEnd,
-        limit: 100,
+      // Automatically determine optimal groupBy
+      const optimalGroupBy = getOptimalGroupBy(normalizedStart, normalizedEnd);
+      setGroupBy(optimalGroupBy);
+
+      const chartData = await getDHT11ChartData({
+        startDate: normalizedStart,
+        endDate: normalizedEnd,
+        groupBy: optimalGroupBy,
       });
 
-      if (!readings.length) {
+      if (!chartData.length) {
         setData([]);
         setNoData(true);
         return;
       }
 
-      const temperatureSeries: ChartSeries = {
+      // Transform to chart series with range data
+      const temperatureSeries: ChartDataWithRange = {
         name: "Temperature",
-        data: readings.map((r) => ({ x: r.timestamp, y: r.temperature })),
+        data: chartData.map((r) => ({
+          x: r.timestamp,
+          y: r.avg_temperature,
+        })),
+        min: chartData.map((r) => ({
+          x: r.timestamp,
+          y: r.min_temperature ?? r.avg_temperature,
+        })),
+        max: chartData.map((r) => ({
+          x: r.timestamp,
+          y: r.max_temperature ?? r.avg_temperature,
+        })),
       };
 
-      const humiditySeries: ChartSeries = {
+      const humiditySeries: ChartDataWithRange = {
         name: "Humidity",
-        data: readings.map((r) => ({ x: r.timestamp, y: r.humidity })),
+        data: chartData.map((r) => ({
+          x: r.timestamp,
+          y: r.avg_humidity,
+        })),
+        min: chartData.map((r) => ({
+          x: r.timestamp,
+          y: r.min_humidity ?? r.avg_humidity,
+        })),
+        max: chartData.map((r) => ({
+          x: r.timestamp,
+          y: r.max_humidity ?? r.avg_humidity,
+        })),
       };
 
       setData([temperatureSeries, humiditySeries]);
@@ -69,6 +103,7 @@ export function useChartData() {
     loading,
     error,
     noData,
+    groupBy,
     fetchData,
   };
 }
