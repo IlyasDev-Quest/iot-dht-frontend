@@ -29,7 +29,7 @@ export interface DHT11ChartData {
   reading_count: number;
 }
 
-export type GroupBy = "hour" | "day" | "week" | "month";
+export type GroupBy = "minute" | "hour" | "day" | "week" | "month";
 
 export interface DHT11ChartQuery {
   startDate: Date;

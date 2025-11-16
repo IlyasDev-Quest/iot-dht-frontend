@@ -78,7 +78,9 @@ export default function ChartCard() {
     tooltip: {
       x: {
         format:
-          groupBy === "hour"
+          groupBy === "minute"
+            ? "dd MMM yyyy HH:mm"
+            : groupBy === "hour"
             ? "dd/MM/yy HH:mm"
             : groupBy === "day"
             ? "dd/MM/yy"
@@ -105,6 +107,8 @@ export default function ChartCard() {
 
   const getGroupByLabel = () => {
     switch (groupBy) {
+      case "minute":
+        return "Per Minute";
       case "hour":
         return "Hourly";
       case "day":

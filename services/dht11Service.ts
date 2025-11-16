@@ -41,18 +41,35 @@ export const getDHT11Readings = async (
   }
 };
 
+// services/dht11Service.ts
 export const getDHT11ChartData = async (
   query: DHT11ChartQuery
 ): Promise<DHT11ChartData[]> => {
   try {
     const params = new URLSearchParams();
-    params.set("start_date", query.startDate.toISOString());
-    params.set("end_date", query.endDate.toISOString());
+
+    // Format dates as local time strings (YYYY-MM-DDTHH:mm:ss)
+    const formatLocalDateTime = (date: Date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      const hours = String(date.getHours()).padStart(2, "0");
+      const minutes = String(date.getMinutes()).padStart(2, "0");
+      const seconds = String(date.getSeconds()).padStart(2, "0");
+
+      return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+    };
+
+    params.set("start_date", formatLocalDateTime(query.startDate));
+    params.set("end_date", formatLocalDateTime(query.endDate));
     params.set("group_by", query.groupBy);
 
-    const { data } = await api.get<DHT11ChartData[]>(
-      `/v1/dht11/readings/chart?${params.toString()}`
-    );
+    const url = `/v1/dht11/readings/chart?${params.toString()}`;
+    console.log("🔍 Fetching chart data:", url);
+
+    const { data } = await api.get<DHT11ChartData[]>(url);
+
+    console.log("📊 Received data:", data);
 
     return Array.isArray(data) ? data : [];
   } catch (error) {
@@ -63,11 +80,12 @@ export const getDHT11ChartData = async (
 
 // Helper function to determine optimal groupBy based on duration
 export const getOptimalGroupBy = (startDate: Date, endDate: Date): GroupBy => {
-  const days = Math.floor(
-    (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+  const hours = Math.floor(
+    (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60)
   );
+  const days = hours / 24;
 
-  if (days <= 1) return "hour";
+  if (hours <= 24) return "minute";
   if (days <= 7) return "hour";
   if (days <= 31) return "day";
   if (days <= 90) return "day";
