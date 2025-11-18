@@ -27,7 +27,7 @@ export default function ChartCard() {
   const options: ApexOptions = {
     chart: {
       height: 350,
-      type: "area",
+      type: "line",
       toolbar: {
         show: true,
         tools: {
@@ -45,14 +45,6 @@ export default function ChartCard() {
     stroke: {
       curve: "smooth",
       width: 2,
-    },
-    fill: {
-      type: "gradient",
-      gradient: {
-        shadeIntensity: 1,
-        opacityFrom: 0.4,
-        opacityTo: 0.1,
-      },
     },
     xaxis: {
       type: "datetime",
@@ -202,7 +194,7 @@ export default function ChartCard() {
           <ReactApexChart
             options={options}
             series={data}
-            type="area"
+            type="line"
             height={350}
           />
         )}
