@@ -21,7 +21,7 @@ export const useDHT11LatestReading = () => {
 
     fetchInitialData();
 
-    const url = `${process.env.NEXT_PUBLIC_BACKEND_API}/v1/events`;
+    const url = `${process.env.NEXT_PUBLIC_BACKEND_API}/v1/events/`;
     const eventSource = new EventSource(url);
 
     const handleNewReading = async () => {
