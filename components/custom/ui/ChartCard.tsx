@@ -49,7 +49,13 @@ export default function ChartCard() {
     xaxis: {
       type: "datetime",
       labels: {
-        datetimeUTC: false,
+        datetimeUTC: false, // This ensures local time display
+        datetimeFormatter: {
+          year: "yyyy",
+          month: "MMM 'yy",
+          day: "dd MMM",
+          hour: "HH:mm",
+        },
       },
     },
     yaxis: [
@@ -73,9 +79,9 @@ export default function ChartCard() {
           groupBy === "minute"
             ? "dd MMM yyyy HH:mm"
             : groupBy === "hour"
-            ? "dd/MM/yy HH:mm"
+            ? "dd MMM yyyy HH:mm"
             : groupBy === "day"
-            ? "dd/MM/yy"
+            ? "dd MMM yyyy"
             : groupBy === "week"
             ? "'Week' w, yyyy"
             : "MMM yyyy",
