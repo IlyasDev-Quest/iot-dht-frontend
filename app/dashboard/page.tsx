@@ -26,11 +26,15 @@ export default function Dashboard() {
         <div className="grid gap-6 sm:grid-cols-2">
           <TemperatureCard
             value={reading?.temperature ?? 0}
-            timestamp={reading?.timestamp ?? ""}
+            timestamp={
+              reading?.timestamp ? new Date(reading.timestamp) : undefined
+            }
           />
           <HumidityCard
             value={reading?.humidity ?? 0}
-            timestamp={reading?.timestamp ?? ""}
+            timestamp={
+              reading?.timestamp ? new Date(reading.timestamp) : undefined
+            }
           />
         </div>
 

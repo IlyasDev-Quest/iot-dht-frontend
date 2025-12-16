@@ -6,7 +6,7 @@ import { InfoCard } from "./InfoCard";
 interface HumidityCardProps {
   value: number;
   maxValue?: number;
-  timestamp?: string | Date;
+  timestamp?: Date;
   unit?: string;
 }
 

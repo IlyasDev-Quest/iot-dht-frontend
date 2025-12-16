@@ -11,7 +11,13 @@ import {
 export const getDHT11LatestReading = async (): Promise<DHT11Reading | null> => {
   try {
     const { data } = await api.get<DHT11Reading>("/v1/dht11/readings/latest");
-    return data;
+
+    if (!data) return null;
+
+    return {
+      ...data,
+      timestamp: new Date(data.timestamp),
+    };
   } catch (error) {
     console.error("Error fetching DHT11 latest reading:", error);
     return null;
@@ -34,7 +40,15 @@ export const getDHT11Readings = async (
       `/v1/dht11/readings?${params.toString()}`
     );
 
-    return Array.isArray(data.items) ? data.items : [];
+    // Convert timestamp strings to Date objects
+    const readings = Array.isArray(data.items)
+      ? data.items.map((r) => ({
+          ...r,
+          timestamp: new Date(r.timestamp),
+        }))
+      : [];
+
+    return readings;
   } catch (error) {
     console.error("Error fetching DHT11 readings:", error);
     return [];
@@ -48,20 +62,9 @@ export const getDHT11ChartData = async (
   try {
     const params = new URLSearchParams();
 
-    // Format dates as local time strings (YYYY-MM-DDTHH:mm:ss)
-    const formatLocalDateTime = (date: Date) => {
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, "0");
-      const day = String(date.getDate()).padStart(2, "0");
-      const hours = String(date.getHours()).padStart(2, "0");
-      const minutes = String(date.getMinutes()).padStart(2, "0");
-      const seconds = String(date.getSeconds()).padStart(2, "0");
-
-      return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
-    };
-
-    params.set("start_date", formatLocalDateTime(query.startDate));
-    params.set("end_date", formatLocalDateTime(query.endDate));
+    // Send UTC timestamps to backend
+    params.set("start_date", query.startDate.toISOString());
+    params.set("end_date", query.endDate.toISOString());
     params.set("group_by", query.groupBy);
 
     const url = `/v1/dht11/readings/chart?${params.toString()}`;
@@ -69,9 +72,17 @@ export const getDHT11ChartData = async (
 
     const { data } = await api.get<DHT11ChartData[]>(url);
 
-    console.log("📊 Received data:", data);
+    // Convert timestamp strings to Date objects
+    const convertedData = Array.isArray(data)
+      ? data.map((d) => ({
+          ...d,
+          timestamp: new Date(d.timestamp),
+        }))
+      : [];
 
-    return Array.isArray(data) ? data : [];
+    console.log("📊 Received data:", convertedData);
+
+    return convertedData;
   } catch (error) {
     console.error("Error fetching DHT11 chart data:", error);
     return [];

@@ -1,7 +1,7 @@
 export interface DHT11Reading {
   temperature: number;
   humidity: number;
-  timestamp: string;
+  timestamp: Date;
 }
 
 export interface DHT11ReadingsQuery {
@@ -19,7 +19,7 @@ export interface DHT11ReadingsResponse {
 }
 
 export interface DHT11ChartData {
-  timestamp: string;
+  timestamp: Date;
   avg_temperature: number;
   avg_humidity: number;
   min_temperature: number | null;

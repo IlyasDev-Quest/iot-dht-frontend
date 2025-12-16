@@ -8,7 +8,7 @@ interface InfoCardProps {
   value: number | string;
   unit?: string;
   maxValue?: number | string;
-  timestamp?: string | Date;
+  timestamp?: Date;
   icon?: ReactNode;
   bgColor?: string;
   iconColor?: string;
