@@ -1,28 +1,34 @@
-// hooks/useChartData.ts
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { getDHT11ChartData, getOptimalGroupBy } from "@/services/dht11Service";
 import { GroupBy } from "@/types/dht11";
 
 export interface ChartSeries {
   name: string;
-  data: { x: number; y: number }[]; // ← Changed from string to number
+  data: { x: number; y: number }[];
 }
 
 export interface ChartDataWithRange extends ChartSeries {
-  min?: { x: number; y: number }[]; // ← Changed from string to number
-  max?: { x: number; y: number }[]; // ← Changed from string to number
+  min?: { x: number; y: number }[];
+  max?: { x: number; y: number }[];
 }
 
 export function useChartData() {
-  const [startDate, setStartDate] = useState<Date | undefined>();
-  const [endDate, setEndDate] = useState<Date | undefined>();
+  // Initialize as undefined to avoid hydration mismatch
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [data, setData] = useState<ChartDataWithRange[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [noData, setNoData] = useState(false);
   const [groupBy, setGroupBy] = useState<GroupBy>("day");
 
-  // hooks/useChartData.ts
+  // Set default dates on client side only
+  useEffect(() => {
+    const today = new Date();
+    setStartDate(today);
+    setEndDate(today);
+  }, []); // Runs once on mount (client-side only)
+
   const fetchData = useCallback(async () => {
     console.log("🚀 fetchData called");
     console.log("📅 Current dates:", { startDate, endDate });
@@ -116,6 +122,13 @@ export function useChartData() {
       setLoading(false);
     }
   }, [startDate, endDate]);
+
+  // Automatically fetch data when dates are set
+  useEffect(() => {
+    if (startDate && endDate) {
+      fetchData();
+    }
+  }, [startDate, endDate, fetchData]);
 
   return {
     startDate,
